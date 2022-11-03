@@ -171,7 +171,7 @@ const resolvers: Record<
           expectedOrigin: origin,
           expectedRPID: rpId,
         });
-      } catch (error) {
+      } catch (error: any) {
         throw new GraphQLError(error.message, {
           extensions: {
             http: {
