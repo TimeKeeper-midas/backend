@@ -11,11 +11,13 @@ datasource db {
 }
 
 model Company {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   displayName  String
-  primaryEmail String
-  information  String
-  users        User[] @relation()
+  primaryEmail String   @unique
+  information  String?
+  users        User[]   @relation()
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model User {
@@ -27,21 +29,32 @@ model User {
   displayName           String
   isAdmin               Boolean        @default(false)
   transactions          Transaction[]  @relation()
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
   companyId             String         @db.ObjectId
 }
 
 model Authenticator {
-  id                  String @id @default(auto()) @map("_id") @db.ObjectId
-  user                User   @relation(fields: [userId], references: [id])
-  credentialId        String
-  credentialPublicKey String
-  counter             Int
-  userId              String @unique @db.ObjectId
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  user                   User     @relation(fields: [userId], references: [id])
+  credentialIdHex        String
+  credentialPublicKeyHex String
+  counter                Int
+  createdAt              DateTime @default(now())
+  userId                 String   @unique @db.ObjectId
 }
 
 model Transaction {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id])
-  type   String
-  userId String @db.ObjectId
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  user             User      @relation(fields: [userId], references: [id])
+  type             String
+  location         String
+  isWorkStart      Boolean   @default(false)
+  isWorkEnd        Boolean   @default(false)
+  isRemoteLocation Boolean
+  manualAdminSetTo DateTime?
+  manualClaimSetTo DateTime?
+  unsafeSentAt     DateTime
+  createdAt        DateTime  @default(now())
+  userId           String    @db.ObjectId
 }

@@ -1,0 +1,51 @@
+scalar Date
+
+type Company {
+  id: ID!
+  displayName: String!
+  primaryEmail: String!
+  information: String
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type User {
+  id: ID!
+  email: String!
+  displayName: String!
+  isAdmin: Boolean!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type Transaction {
+  id: ID!
+  user: User!
+  type: String!
+  location: String!
+  isWorkStart: Boolean!
+  isWorkEnd: Boolean!
+  isRemoteLocation: Boolean!
+  manualAdminSetTo: Date
+  manualClaimSetTo: Date
+  unsafeSentAt: Date!
+  createdAt: Date!
+}
+
+type Query {
+  company: Company!
+  users: [User!]!
+  user: User!
+  transactions(startDate: Date, endDate: Date, userIds: [String!]): [Transaction!]!
+}
+
+type Mutation {
+  addCompany(adminEmail: String!, displayName: String!, primaryEmail: String!): Company!
+  upsertUser(email: String!, displayName: String!, isAdmin: Boolean): User!
+  deleteUser(id: String!): User!
+  startRegistrationChallenge(email: String!): String!
+  finishRegistrationChallenge(email: String!, attestation: String!): String!
+  startAuthenticationChallenge(): String!
+  finishAuthenticationChallenge(attestation: String!): String!
+  registerTransaction(type: String!, location: String!, isWorkStart: Boolean!, isWorkEnd: Boolean!, isRemoteLocation: Boolean!, unsafeSentAt: Date!, manualClaimSetTo: Date): Transaction!
+}
