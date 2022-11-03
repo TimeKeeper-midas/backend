@@ -16,7 +16,11 @@ import type {
 	VerifiedAuthenticationResponse,
 	VerifiedRegistrationResponse,
 } from '@simplewebauthn/server';
-import type {RegistrationCredentialJSON} from '@simplewebauthn/typescript-types';
+import type {
+	AuthenticationCredentialJSON,
+	RegistrationCredentialJSON,
+} from '@simplewebauthn/typescript-types';
+import {config} from 'dotenv';
 import {GraphQLError, GraphQLScalarType, Kind} from 'graphql';
 import type {GraphQLFieldResolver} from 'graphql';
 import type {JWTVerifyResult} from 'jose';
@@ -26,13 +30,15 @@ type Context = {
 	user: User | undefined;
 };
 
+config();
+
 const rpName = 'TimeKeeper';
 const rpId = 'tk-hackathon.azurewebsites.net';
 const origin = 'https://timekeeper-midas.github.io';
 
 const resolvers: Record<
 	string,
-	Record<string, string | GraphQLFieldResolver<unknown, Context>>
+	GraphQLScalarType | Record<string, GraphQLFieldResolver<unknown, Context>>
 > = {
 	Date: new GraphQLScalarType({
 		name: 'Date',
@@ -168,6 +174,13 @@ const resolvers: Record<
 				return company.users.map(({transactions}) => transactions);
 			}
 		},
+		startAuthenticationChallenge(parent, args, context) {
+			const options = generateAuthenticationOptions({
+				userVerification: 'preferred',
+			});
+
+			return JSON.stringify(options);
+		},
 	},
 	Mutation: {
 		async addCompany(
@@ -185,7 +198,9 @@ const resolvers: Record<
 					where: {
 						email: args.adminEmail,
 					},
-					select: {},
+					select: {
+						id: true,
+					},
 				})) !== null
 			) {
 				throw new GraphQLError('다른 회사에 등록된 관리 사원 이메일입니다.', {
@@ -202,7 +217,9 @@ const resolvers: Record<
 					where: {
 						primaryEmail: args.primaryEmail,
 					},
-					select: {},
+					select: {
+						id: true,
+					},
 				})) !== null
 			) {
 				throw new GraphQLError('다른 회사에 등록된 기업 대표 이메일입니다.', {
@@ -315,7 +332,9 @@ const resolvers: Record<
 					id: true,
 					email: true,
 					authenticator: {
-						select: {},
+						select: {
+							id: true,
+						},
 					},
 				},
 			});
@@ -450,13 +469,6 @@ const resolvers: Record<
 
 			return sign(user.id);
 		},
-		async startAuthenticationChallenge(parent, args, context) {
-			const options = generateAuthenticationOptions({
-				userVerification: 'preferred',
-			});
-
-			return JSON.stringify(options);
-		},
 		async finishAuthenticationChallenge(
 			parent,
 			args: {attestation: any},
@@ -508,7 +520,7 @@ const resolvers: Record<
 			let verification: VerifiedAuthenticationResponse;
 			try {
 				verification = await verifyAuthenticationResponse({
-					credential: attestation,
+					credential: attestation as AuthenticationCredentialJSON,
 					expectedChallenge() {
 						return true;
 					},
@@ -652,7 +664,7 @@ const prisma = new PrismaClient();
 await prisma.$connect();
 
 const server = new ApolloServer<Context>({
-	typeDefs: await readFile('../schema.graphql', 'utf8'),
+	typeDefs: await readFile('./schema.graphql', 'utf8'),
 	resolvers,
 });
 

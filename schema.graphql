@@ -37,15 +37,15 @@ type Query {
   users: [User!]!
   user: User!
   transactions(startDate: Date, endDate: Date, userIds: [String!]): [Transaction!]!
+  startAuthenticationChallenge: String!
 }
 
 type Mutation {
-  addCompany(adminEmail: String!, displayName: String!, primaryEmail: String!): Company!
+  addCompany(adminEmail: String!, adminDisplayName: String!, displayName: String!, primaryEmail: String!): Company!
   upsertUser(email: String!, displayName: String!, isAdmin: Boolean): User!
   deleteUser(id: String!): User!
   startRegistrationChallenge(email: String!): String!
   finishRegistrationChallenge(email: String!, attestation: String!): String!
-  startAuthenticationChallenge(): String!
   finishAuthenticationChallenge(attestation: String!): String!
   registerTransaction(type: String!, location: String!, isWorkStart: Boolean!, isWorkEnd: Boolean!, isRemoteLocation: Boolean!, unsafeSentAt: Date!, manualClaimSetTo: Date): Transaction!
 }
