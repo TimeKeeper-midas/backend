@@ -20,6 +20,7 @@ import type {
 	AuthenticationCredentialJSON,
 	RegistrationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
+import {config} from 'dotenv';
 import {GraphQLError, GraphQLScalarType, Kind} from 'graphql';
 import type {GraphQLFieldResolver} from 'graphql';
 import type {JWTVerifyResult} from 'jose';
@@ -28,6 +29,8 @@ import {jwtVerify, SignJWT} from 'jose';
 type Context = {
 	user: User | undefined;
 };
+
+config();
 
 const rpName = 'TimeKeeper';
 const rpId = 'tk-hackathon.azurewebsites.net';
