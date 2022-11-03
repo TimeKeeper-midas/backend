@@ -33,8 +33,8 @@ type Context = {
 config();
 
 const rpName = 'TimeKeeper';
-const rpId = 'tk-hackathon.azurewebsites.net';
-const origin = 'https://timekeeper-midas.github.io';
+const rpId = 'timekeeper-midas.github.io';
+const origin = `https://${rpId}`;
 
 const resolvers: Record<
 	string,
