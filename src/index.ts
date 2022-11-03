@@ -1,5 +1,6 @@
 import {Buffer} from 'node:buffer';
 import {readFile} from 'node:fs/promises';
+import {env} from 'node:process';
 import {ApolloServer} from '@apollo/server';
 // eslint-disable-next-line n/file-extension-in-import
 import {startStandaloneServer} from '@apollo/server/standalone';
@@ -19,7 +20,6 @@ import type {
 	AuthenticationCredentialJSON,
 	RegistrationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
-import {config} from 'dotenv';
 import {GraphQLError, GraphQLScalarType, Kind} from 'graphql';
 import type {GraphQLFieldResolver} from 'graphql';
 import type {JWTVerifyResult} from 'jose';
@@ -28,8 +28,6 @@ import {jwtVerify, SignJWT} from 'jose';
 type Context = {
 	user: User | undefined;
 };
-
-config();
 
 const rpName = 'TimeKeeper';
 const rpId = 'tk-hackathon.azurewebsites.net';
@@ -669,7 +667,7 @@ const server = new ApolloServer<Context>({
 
 const {url} = await startStandaloneServer(server, {
 	listen: {
-		port: Number.parseInt(process.env.PORT, 10) || 4000,
+		port: Number.parseInt(env.PORT ?? '', 10) || 4000,
 	},
 	async context({req}) {
 		const token = req.headers.authorization?.split(' ')[1];
