@@ -1,6 +1,5 @@
 import {Buffer} from 'node:buffer';
 import {readFile} from 'node:fs/promises';
-import {env} from 'node:process';
 import {ApolloServer} from '@apollo/server';
 // eslint-disable-next-line n/file-extension-in-import
 import {startStandaloneServer} from '@apollo/server/standalone';
@@ -670,7 +669,7 @@ const server = new ApolloServer<Context>({
 
 const {url} = await startStandaloneServer(server, {
 	listen: {
-		port: Number.parseInt(env.PORT, 10) || 3000,
+		port: Number.parseInt(process.env.PORT, 10) || 3000,
 	},
 	async context({req}) {
 		const token = req.headers.authorization?.split(' ')[1];
