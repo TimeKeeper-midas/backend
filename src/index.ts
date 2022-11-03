@@ -670,7 +670,7 @@ const server = new ApolloServer<Context>({
 
 const {url} = await startStandaloneServer(server, {
 	listen: {
-		port: Number.parseInt(env.PORT ?? '4000', 10),
+		port: Number.parseInt(env.PORT, 10) || 3000,
 	},
 	async context({req}) {
 		const token = req.headers.authorization?.split(' ')[1];
