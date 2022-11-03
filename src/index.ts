@@ -18,7 +18,7 @@ type Context = {
 
 const rpName = 'TimeKeeper';
 const rpId = 'tk-hackathon.azurewebsites.net';
-const origin = `https://${rpId}`;
+const origin = `https://timekeeper-midas.github.io`;
 
 const resolvers: Record<
   string,
@@ -133,7 +133,7 @@ const resolvers: Record<
     },
     async finishRegistrationChallenge(
       parent,
-      args: {email: string; attestation: Record<string, any>},
+      args: {email: string; attestation: any},
       context,
     ) {
       if (context.user.registrationChallenge === null) {
@@ -152,6 +152,14 @@ const resolvers: Record<
           expectedChallenge: context.user.registrationChallenge,
           expectedOrigin: origin,
           expectedRPID: rpId,
+        });
+      } catch(error) {
+        throw new GraphQLError(error.message, {
+          extensions: {
+            http: {
+              status: 400,
+            },
+          },
         });
       }
     },
